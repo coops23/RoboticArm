@@ -1,26 +1,29 @@
 #include "Joint.h"
 
-#define J0_CORRECTION(q1) (((180-q1)-80)*2)
-#define J1_CORRECTION(q2) ((q2*0.888889)+100)
+#define J0_CORRECTION(q0) (q0+140)
+#define J1_CORRECTION(q1) (((180-q1)-80)*2)
+#define J2_CORRECTION(q2) ((q2*0.888889)+100)
 
 //Board Settings
 const int baud_rate = 9600;
 
 //Pin Mappings
-const int joint0_pin = 9;
-const int joint1_pin = 10;
-const int joint2_pin = 11;
-const int joint3_pin = 12;
+const int joint0_pin = 6;
+const int joint1_pin = 9;
+const int joint2_pin = 10;
+const int joint3_pin = 11;
+const int joint4_pin = 12;
 
 //Joint Settings
 int delayMs = 20;
-int jointReady[4] = {0,0,0,0};
+int jointReady[5] = {0,0,0,0,0};
 
 //Servo declarations
 Joint joint0 = Joint();
 Joint joint1 = Joint();
 Joint joint2 = Joint();
 Joint joint3 = Joint();
+Joint joint4 = Joint();
 
 //Global variables
 String inputString = "";         // a string to hold incoming data
@@ -28,54 +31,43 @@ boolean stringComplete = false;  // whether the string is complete
 
 //Function Definitions
 String getValue(String data, char separator, int index);
-int ready(int joint0, int joint1, int joint2, int joint3);
+int ready(int joint0, int joint1, int joint2, int joint3, int joint4);
 
 void setup() {
     Serial.begin(baud_rate);
     inputString.reserve(200);
 
-    joint0.Initialize(joint0_pin, 0, 180, J0_CORRECTION(90)); //156
-    joint1.Initialize(joint1_pin, 0, 180, J1_CORRECTION(90)); //85
-    joint2.Initialize(joint2_pin, 0, 180, 70); //70
-    joint3.Initialize(joint3_pin, 0, 150, 0); //0
+    joint0.Initialize(joint0_pin, 0, 180, J0_CORRECTION(0));
+    joint1.Initialize(joint1_pin, 0, 180, J1_CORRECTION(90)); //156
+    joint2.Initialize(joint2_pin, 0, 180, J2_CORRECTION(90)); //85
+    joint3.Initialize(joint3_pin, 0, 180, 70); //70
+    joint4.Initialize(joint4_pin, 0, 150, 0); //0
 }
 
 void loop() {
     int armReady = 0;
 
-    armReady = ready(joint0.Update(), joint1.Update(), joint2.Update(), joint3.Update());
-    delay(delayMs);
+    armReady = ready(joint0.Update(), joint1.Update(), joint2.Update(), joint3.Update(), joint4.Update());
+    //delay(delayMs);
     
     if (stringComplete) 
     {
-        String joint0Str, joint1Str, joint2Str, joint3Str, delayMsStr;
+        String joint0Str, joint1Str, joint2Str, joint3Str, joint4Str, delayMsStr;
 
-        if(inputString.equalsIgnoreCase("status\n") or inputString.equalsIgnoreCase("status"))
-        {
-            Serial.println(armReady);
-        }
-        else
-        {
-            joint0Str = getValue(inputString, ',', 0);
-            joint1Str = getValue(inputString, ',', 1);
-            joint2Str = getValue(inputString, ',', 2);
-            joint3Str = getValue(inputString, ',', 3);
-            delayMsStr = getValue(inputString, ',', 4);
+        joint0Str = getValue(inputString, ',', 0);
+        joint1Str = getValue(inputString, ',', 1);
+        joint2Str = getValue(inputString, ',', 2);
+        joint3Str = getValue(inputString, ',', 3);
+        joint4Str = getValue(inputString, ',', 4);
+        delayMsStr = getValue(inputString, ',', 5);
 
-            
-            joint0.Write(J0_CORRECTION(joint0Str.toInt()));
-            joint1.Write(J1_CORRECTION(joint1Str.toInt()));
-            joint2.Write(joint2Str.toInt());
-            joint3.Write(joint3Str.toInt());
-            delayMs = delayMsStr.toInt();
-             
-            Serial.print(joint0Str); Serial.print(" -- ");
-            Serial.print(joint1Str); Serial.print(" -- ");
-            Serial.print(joint2Str); Serial.print(" -- ");
-            Serial.print(joint3Str); Serial.print(" -- ");
-            Serial.println(delayMs);
-        }
-        
+        joint0.Write(J0_CORRECTION(joint0Str.toInt()));
+        joint1.Write(J1_CORRECTION(joint1Str.toInt()));
+        joint2.Write(J2_CORRECTION(joint2Str.toInt()));
+        joint3.Write(joint3Str.toInt());
+        joint4.Write(joint4Str.toInt());
+        delayMs = delayMsStr.toInt();
+
         // clear the string:
         inputString = "";
         stringComplete = false;
@@ -113,8 +105,8 @@ String getValue(String data, char separator, int index)
     return found>index ? data.substring(strIndex[0], strIndex[1]) : "";
 }
 
-int ready(int joint0, int joint1, int joint2, int joint3)
+int ready(int joint0, int joint1, int joint2, int joint3, int joint4)
 {
-    return (joint0 && joint1 && joint2 && joint3);
+    return (joint0 && joint1 && joint2 && joint3 && joint4);
 }
 
