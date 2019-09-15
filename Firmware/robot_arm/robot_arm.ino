@@ -1,8 +1,8 @@
 #include "Joint.h"
 
-#define J0_CORRECTION(q0) (q0+140)
-#define J1_CORRECTION(q1) (((180-q1)-80)*2)
-#define J2_CORRECTION(q2) ((q2*0.888889)+100)
+//#define J0_CORRECTION(q0) (q0+140)
+//#define J1_CORRECTION(q1) (((180-q1)-80)*2)
+//#define J2_CORRECTION(q2) ((q2*0.888889)+100)
 
 //Board Settings
 const int baud_rate = 9600;
@@ -37,9 +37,9 @@ void setup() {
     Serial.begin(baud_rate);
     inputString.reserve(200);
 
-    joint0.Initialize(joint0_pin, 0, 180, J0_CORRECTION(0));
-    joint1.Initialize(joint1_pin, 0, 180, J1_CORRECTION(90)); //156
-    joint2.Initialize(joint2_pin, 0, 180, J2_CORRECTION(90)); //85
+    joint0.Initialize(joint0_pin, 0, 180, 140);
+    joint1.Initialize(joint1_pin, 0, 180, 20); //156
+    joint2.Initialize(joint2_pin, 0, 180, 85); //85
     joint3.Initialize(joint3_pin, 0, 180, 70); //70
     joint4.Initialize(joint4_pin, 0, 150, 0); //0
 }
@@ -48,7 +48,7 @@ void loop() {
     int armReady = 0;
 
     armReady = ready(joint0.Update(), joint1.Update(), joint2.Update(), joint3.Update(), joint4.Update());
-    //delay(delayMs);
+    delay(delayMs);
     
     if (stringComplete) 
     {
@@ -61,9 +61,9 @@ void loop() {
         joint4Str = getValue(inputString, ',', 4);
         delayMsStr = getValue(inputString, ',', 5);
 
-        joint0.Write(J0_CORRECTION(joint0Str.toInt()));
-        joint1.Write(J1_CORRECTION(joint1Str.toInt()));
-        joint2.Write(J2_CORRECTION(joint2Str.toInt()));
+        joint0.Write(joint0Str.toInt());
+        joint1.Write(joint1Str.toInt());
+        joint2.Write(joint2Str.toInt());
         joint3.Write(joint3Str.toInt());
         joint4.Write(joint4Str.toInt());
         delayMs = delayMsStr.toInt();

@@ -80,16 +80,16 @@ def InverseKinPolar(r, z, q0, R_MIN, R_MAX, Z_MIN, Z_MAX, Q0_MIN, Q0_MAX, Q1_MIN
                     2 * L1 * math.sqrt(math.pow(r, 2) + math.pow(z, 2))))
 
         righty_q1 = int(math.degrees(tau - alpha))
-        righty_q2 = int(math.degrees(math.pi - beta))
+        righty_q2 = int(math.degrees(math.pi - beta)) * -1
         lefty_q1 = int(math.degrees(tau + alpha))
-        lefty_q2 = int(math.degrees(beta - math.pi))
+        lefty_q2 = int(math.degrees(beta - math.pi)) * -1
 
         if (righty_q1 > Q1_MIN and righty_q1 < Q1_MAX and righty_q2 > Q2_MIN and righty_q2 < Q2_MAX):
             q1 = righty_q1
-            q2 = -1 * righty_q2
+            q2 = righty_q2
         elif (lefty_q1 > Q1_MIN and lefty_q1 < Q1_MAX and lefty_q2 > Q2_MIN and lefty_q2 < Q2_MAX):
             q1 = lefty_q1
-            q2 = -1 * lefty_q2
+            q2 = lefty_q2
         else:
             raise ValueError
 
